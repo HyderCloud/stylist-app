@@ -1,11 +1,42 @@
 import { View, Text, TextInput, StyleSheet, Image, ImageBackground,
-  KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, TouchableOpacity  } from 'react-native'
+  KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, TouchableOpacity,  
+  Button} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import React, { useState,  useEffect, useRef } from 'react';
 import { Link } from 'expo-router';
+import { API_URL, useAuth } from './AuthContext';
+import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 const sginUp = () => {
+  const router = useRouter()
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
+  const [showPassword, setShowPassword] = useState(true)
+  const {onRegister, onLogin} = useAuth()
+
+  const login = async ()=>{
+    const result = await onLogin!(email, password);
+    if(result && result.error) {
+      alert(result.msg)
+    }
+  }
+
+  const register = async ()=>{
+    const result = await onRegister!(username, email, password);
+    if(result && result.error) {
+      alert(result.msg)
+    } else {
+      login()
+    }
+  }
+
+  const onShowPass = ()=>{
+    setShowPassword(!showPassword)
+  }
+
   useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
         setKeyboardVisible(true);
@@ -19,17 +50,15 @@ const sginUp = () => {
         keyboardDidHideListener.remove();
         keyboardDidShowListener.remove();
       };
+
     }, []);
 
 return (
-<KeyboardAvoidingView
-    style={styles.container}
-    behavior={Platform.OS === 'ios' && !keyboardVisible || Platform.OS === 'android' && !keyboardVisible ? 'padding' : 'height'}
-  >
+
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
 
-          <View style={[{marginTop: 60 }]}>
+          <View style={[{marginTop: "14%" }]}>
               <ImageBackground
                   source={require('@/assets/images/signlogo.png')}
                   style={styles.backgroundlogo}
@@ -60,8 +89,8 @@ return (
                   end={{ x: 1.0275, y: 0.5 }}
                   style={styles.inputContainer}
                 >
-                  <TextInput style={styles.input} placeholder="שם משתמש"/>
-                  <Image style={{marginRight: 50}} source={require("@/assets/images/person.png")}/>
+                  <TextInput onChangeText={(text: string)=>{setUsername(text)}} style={styles.input} placeholder="שם משתמש"/>
+                  <Image style={{right: 20, position: 'absolute'}}  source={require("@/assets/images/person.png")}/>
                 </LinearGradient>
               </View>
             </View>
@@ -78,8 +107,8 @@ return (
                   end={{ x: 1.0275, y: 0.5 }}
                   style={styles.inputContainer}
                 >
-                  <TextInput style={styles.input} placeholder='כתובת אי-מייל'/>
-                  <Image style={{marginRight: 50}} source={require("@/assets/images/mail.png")}/>
+                  <TextInput onChangeText={(text: string)=>{setEmail(text)}} style={styles.input} placeholder='כתובת אי-מייל'/>
+                  <Image style={{right: 20, position: 'absolute'}}  source={require("@/assets/images/mail.png")}/>
                 </LinearGradient>
               </View>
             </View>
@@ -97,14 +126,20 @@ return (
                   end={{ x: 1.0275, y: 0.5 }}
                   style={styles.inputContainer}
                 >
-                <Image style={{left: 20, position: "absolute"}} source={require("@/assets/images/eyeclose.png")}/>
-                <TextInput style={styles.input} placeholder="********" secureTextEntry />
-                <Image style={{marginRight: 50}} source={require("@/assets/images/key.png")}/>
+                  <TouchableOpacity style={{paddingLeft: 50}}  onPress={onShowPass}>
+                  {showPassword?
+                <Image source={require(`@/assets/images/eyeclose.png`)}/>:
+                <Image source={require(`@/assets/images/openeye.png`)}/>
+                    }
+                  </TouchableOpacity>
+                <TextInput style={[styles.input, {paddingRight: 80}]} placeholder="סיסמה" secureTextEntry={showPassword} 
+                onChangeText={(text: string)=>{setPassword(text)}} />
+                <Image style={{right: 20, position: 'absolute'}} source={require("@/assets/images/key.png")}/>
                 </LinearGradient>
               </View>
             </View>
             <View><Text style={[styles.labelInput, {fontSize:12}]}>שכחת את הסיסמה?</Text></View>
-            <View style={{marginTop: 20, alignItems: "center"}}>
+            <View style={{marginTop: "3%", alignItems: "center"}}>
             <LinearGradient
                   colors={[
                     '#7EE7FC', 
@@ -114,21 +149,21 @@ return (
                   end={{ x: 1.0275, y: 0.5 }}
                   style={styles.inputContainer}
                 >
-            <TouchableOpacity style={styles.button}
+            <TouchableOpacity  style={styles.button}
       onPress={() => {
-        alert('Button Pressed');
+        register()
       }}
       activeOpacity={0.7} // Controls the opacity when pressed
-    ><Text style={styles.buttonText}>התחברות</Text></TouchableOpacity>
+    ><Text style={styles.buttonText}>הרשמה</Text></TouchableOpacity>
                 </LinearGradient>
-    <Text style={styles.registerText}>עוד לא נרשמת? <Link style={styles.linkText} href={"/(auth)/sign-in"}>התחבר/י</Link></Text>
+    <Text style={styles.registerText}>כבר נרשמת אלינו? <Link style={styles.linkText} href={"/(auth)/sign-in"}>התחבר/י</Link></Text>
             </View>
             <View style={[styles.row,{marginTop: 0, alignItems: "center"}]}>
               <Image source={require("@/assets/images/Rectangle3.png")}/>
               <Text style={styles.sginLable}>או להתחבר בעזרת</Text>
               <Image source={require("@/assets/images/Rectangle4.png")}/>
               </View>
-              <View style={[styles.row2, {marginTop: 30}]}>
+              <View style={[styles.row2, {marginTop: "5%"}]}>
               <Image style={{marginRight: 50}} source={require("@/assets/images/facebook.png")}/>
               <Image source={require("@/assets/images/google.png")}/>
               </View>
@@ -136,7 +171,7 @@ return (
         </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
-  </KeyboardAvoidingView>
+
 )
 }
 export default sginUp
@@ -182,7 +217,7 @@ const styles = StyleSheet.create(
           alignItems: 'center', // Center the content horizontally
         },
         headerView:{
-          marginTop: 10,
+          marginTop: 30,
           justifyContent: 'center', // Center the content vertically
           alignItems: 'center', 
         },
@@ -202,7 +237,7 @@ const styles = StyleSheet.create(
           lineHeight: 20
         },
         loginContainer:{
-          marginTop: 70,
+          marginTop: "12%",
           height: 420,
           width: "100%",
           justifyContent: 'center', // Center the content vertically
@@ -223,7 +258,7 @@ const styles = StyleSheet.create(
           flexDirection: 'row', // Align items in a row
           alignItems: 'center',
           textAlign: "right",
-          width: 315,
+          width: "100%",
           height: 55,
           borderRadius: 10,
           borderWidth: 0.2, // Border width of 0.2px
@@ -240,7 +275,7 @@ const styles = StyleSheet.create(
           justifyContent: 'center',
         },
         input: {
-          paddingRight: 10,
+          paddingRight: 50,
           alignItems: 'center',
           textAlign: "right",
           width:'100%',

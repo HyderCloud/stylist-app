@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef , useState} from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,17 @@ import {
   StyleSheet,
   Dimensions,
   SafeAreaView,
-  Image
+  Image,
+  ImageBackground,
+  Modal
 } from 'react-native';
+import AvatarForm from './GenderAvatarForm';
 const { height: windowHeight } = Dimensions.get('window');
 
 const Home = () => {
     const scrollY = useRef(new Animated.Value(0)).current;
-
+    const [modalVisible, setModalVisible] = useState(true);
+    const [openModal, setOpenModal] = useState(true)
     const headerHeight = scrollY.interpolate({
       inputRange: [0, 100],
       outputRange: [windowHeight * 0.75, windowHeight * 0.7],
@@ -57,9 +61,11 @@ const Home = () => {
       { useNativeDriver: false }
     )}
     scrollEventThrottle={16}
+    horizontal={false} // Prevent horizontal scrolling
     >
 
     <Animated.View style={[styles.header, { height: headerHeight }]}>
+
       <Animated.View style={[{marginTop: animatedMargin3}]}>
         <Text style={styles.helpText}>איך אוכל לעזור לך</Text>
         <Text style={styles.helpText}>היום?</Text>
@@ -107,6 +113,10 @@ const Home = () => {
 export default Home
 
 const styles = StyleSheet.create({
+  popup: {
+    flex: 1,
+    backgroundColor: "#121212"
+  },
     fixedHeightView: {
       alignItems: "center",
       height: 400, // Fixed height of 200px
@@ -116,6 +126,8 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: "#010101",
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     row: {
       flexDirection: 'row',
@@ -148,7 +160,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
     },
     scrollContent: {
-      padding: 20,
+ 
     },
     contentText: {
       fontSize: 16,

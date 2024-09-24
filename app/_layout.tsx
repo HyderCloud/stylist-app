@@ -1,15 +1,17 @@
-import { View, Text , Image} from 'react-native'
+import { View, Text , Image, TouchableOpacity,StyleSheet} from 'react-native'
 import React, { useEffect } from 'react'
 import {Drawer} from 'expo-router/drawer'
 // import { DrawerToggleButton } from '@react-navigation/drawer'
 import { useFonts } from 'expo-font'
-import { SplashScreen, Redirect } from 'expo-router'
+import { SplashScreen, Redirect, router } from 'expo-router'
 import DrawerToggleButton from '../components/DrawerButton'
 import { AuthProvider, useAuth } from './(auth)/AuthContext'
+import { AvatarAuthProvider, useAvatarAuth } from './(auth)/AuthAvatar'
 
 SplashScreen.preventAutoHideAsync()
 export default function _layout() {
-    const { authState, onLogout} = useAuth()
+
+
     const [fontsLoad, error] = useFonts({
         "Heebo": require("../assets/fonts/Heebo.ttf"),
         "Heebo-Bold": require("../assets/fonts/Heebo-Bold.ttf"),
@@ -22,16 +24,21 @@ export default function _layout() {
         if(fontsLoad) SplashScreen.hideAsync()
         },[fontsLoad, error])
         if(!fontsLoad && !error) return null
-  return( <AuthProvider>
+  return( <AvatarAuthProvider>
+  <AuthProvider>
     <Layout/>
-  </AuthProvider>)
+  </AuthProvider>
+  </AvatarAuthProvider>
+  )
 }
 
 export const Layout = ()=>{
     const { authState, onLogout} = useAuth()
+    const { avatarAuthState} = useAvatarAuth()
 return(
     <Drawer screenOptions={{
-        headerShown: authState?.authenticate ? true : false,
+        swipeEnabled: authState?.authenticated && avatarAuthState?.avatarAuthenticated == null ? true : false,
+        headerShown: authState?.authenticated && avatarAuthState?.avatarAuthenticated == null ? true : false,
         drawerPosition: 'right',
         headerStyle: {
             borderBottomWidth: 0, // Removes the bottom border
@@ -79,13 +86,20 @@ return(
             title: ""
         }}/>
                      <Drawer.Screen name='(auth)/sign-in' options={{
-            drawerLabel: "לוגין",
-            title: ""
-        }}/>
-                    <Drawer.Screen name='(auth)/sign-up' options={{
-            drawerLabel: "לוגין",
+
+            drawerLabel: ()=><TouchableOpacity style={styles.logoutcontainer} onPress={onLogout}>
+                <Text style={styles.logout}>התנתקות</Text></TouchableOpacity>,
             title: ""
         }}/>
       </Drawer>
 )
 }
+
+const styles = StyleSheet.create({
+    logout: {
+        color: '#fff'
+    },
+    logoutcontainer: {
+        width: "100%"
+    }
+})

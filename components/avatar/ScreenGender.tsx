@@ -7,7 +7,7 @@ import Man from './Man'
 import Woman from './Woman';
 
 const Screen = () => {
-
+const [continueGender, setContinueGender] = useState('')
   return (
     <LinearGradient  colors={[
       '#7EE7FC4D', 
@@ -20,7 +20,7 @@ const Screen = () => {
         <Text >התאמה מגדרית</Text>
       </View>
       <View style={styles.avatarContainer}>
-      <TouchableOpacity style={styles.secContainer}>
+      <TouchableOpacity style={styles.secContainer} onPress={()=>{setContinueGender('male')}}>
         <Canvas camera={{position: [-2,2.5,5], fov: 30}}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 10, 5]} intensity={15} />
@@ -29,7 +29,7 @@ const Screen = () => {
         </Suspense>
       </Canvas>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.secContainer}>
+      <TouchableOpacity style={styles.secContainer} onPress={()=>{setContinueGender('female')}}>
       <Canvas camera={{position: [-2,2.5,5], fov: 30}}>
             <ambientLight intensity={0.5} />
         <directionalLight position={[5, 10, 5]} intensity={15} />
